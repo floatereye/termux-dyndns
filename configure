@@ -1,0 +1,47 @@
+#!/bin/bash
+
+echo "Checking and installing dependencies for Termux..."
+
+# Install GCC if not present
+if ! command -v gcc &>/dev/null; then
+    echo "Installing GCC..."
+    pkg install -y gcc
+fi
+
+# Install libcurl if not present
+if ! pkg list-installed | grep -q '^libcurl'; then
+    echo "Installing libcurl..."
+    pkg install -y libcurl
+fi
+
+# Install json-c if not present
+if ! pkg list-installed | grep -q '^json-c'; then
+    echo "Installing json-c..."
+    pkg install -y json-c
+fi
+
+echo "Creating Makefile..."
+cat <<EOL > Makefile
+CC = gcc
+CFLAGS = -Wall -O2
+LIBS = -lcurl -ljson-c
+TARGET = dyndns
+SRC = dyndns.c
+
+all: \$(TARGET)
+
+\$(TARGET): \$(SRC)
+	\$(CC) \$(CFLAGS) -o \$(TARGET) \$(SRC) \$(LIBS)
+
+clean:
+	rm -f \$(TARGET)
+
+install:
+	cp \$(TARGET) /data/data/com.termux/files/usr/bin/
+
+uninstall:
+	rm -f /data/data/com.termux/files/usr/bin/\$(TARGET)
+EOL
+
+echo "Configuration complete. You can now run 'make' to build the project."
+
