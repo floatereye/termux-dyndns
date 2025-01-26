@@ -7,4 +7,4 @@ Options:
   -d <delay>    Delay in seconds before execution (default: 2)
   -n, --name    Name to display in output (default: dyndns)
   -h, --help    Show this help message
-```
+````
