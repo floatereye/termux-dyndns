@@ -24,13 +24,12 @@ fi
 
 echo "Creating Makefile..."
 
-# Use printf instead of echo for better control over formatting
 cat <<'EOL' > Makefile
 CC = clang  # Using clang, the default compiler for Termux (based on LLVM)
 CFLAGS = -Wall -O2
 LIBS = -lcurl -ljson-c
 TARGET = dyndns
-SRC = dyndns.c
+SRC = $(TARGET).c
 
 all: $(TARGET)
 
@@ -39,9 +38,15 @@ $(TARGET): $(SRC)
 
 clean:
 	rm -f $(TARGET)
+	rm -rf release/
+
+release: all
+	mkdir -p release/
+	cp $(TARGET) release/
+	strip -s release/$(TARGET)
 
 install:
-	install -m 755 $(TARGET) /data/data/com.termux/files/usr/bin/
+	install -m 755 $(TARGET) $(PREFIX)/bin/
 
 uninstall:
 	rm -f /data/data/com.termux/files/usr/bin/$(TARGET)
