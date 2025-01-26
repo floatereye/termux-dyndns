@@ -1,4 +1,4 @@
-CC = gcc
+CC = clang  # Using clang, the default compiler for Termux (based on LLVM)
 CFLAGS = -Wall -O2
 LIBS = -lcurl -ljson-c
 TARGET = dyndns
@@ -13,7 +13,7 @@ clean:
 	rm -f $(TARGET)
 
 install:
-	cp $(TARGET) /data/data/com.termux/files/usr/bin/
+	install -m 755 $(TARGET) /data/data/com.termux/files/usr/bin/
 
 uninstall:
 	rm -f /data/data/com.termux/files/usr/bin/$(TARGET)
