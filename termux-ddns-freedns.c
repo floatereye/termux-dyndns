@@ -95,7 +95,7 @@ int main(int argc, char *argv[]) {
     char *json_file = malloc(progname_len + 6); // +6 for ".json" and null terminator
     snprintf(json_file, progname_len + 6, "%s.json", progname);
     Config config = {json_file, 2, NULL};
-		free(json_file);
+    free(json_file);
 
     int option;
     static struct option long_options[] = {
