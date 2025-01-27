@@ -122,10 +122,10 @@ int main(int argc, char *argv[]) {
                 break;
             case 'h':
                 print_help(argv[0], config);
-						    return EXIT_SUCCESS;
+                return EXIT_SUCCESS;
             default:
-                print_help(argv[0], config);
-						    return EXIT_SUCCESS;
+            		print_help(argv[0], config);
+            		return EXIT_SUCCESS;
 
         }
     }
