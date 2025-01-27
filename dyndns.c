@@ -16,10 +16,12 @@ typedef struct {
 size_t write_callback(void *ptr, size_t size, size_t nmemb, FILE *stream) {
     return fwrite(ptr, size, nmemb, stream);
 }
+
 void dyndns_req(Config config) {
     CURL *curl = curl_easy_init();
     if (!curl) {
         perror("Error initializing curl");
+        curl_easy_cleanup(curl);
         exit(EXIT_FAILURE);
     }
 
