@@ -121,7 +121,7 @@ int main(int argc, char *argv[]) {
                 config.delay = atoi(optarg);
                 break;
             case 'h':
-                print_help(argv[0], config);
+            		print_help(argv[0], config);
                 return EXIT_SUCCESS;
             default:
             		print_help(argv[0], config);
