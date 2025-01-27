@@ -110,17 +110,18 @@ int main(int argc, char *argv[]) {
                 break;
             case 'h':
                 print_help(config);
-                return 1;
+						    return EXIT_SUCCESS;
             default:
                 print_help(config);
-                return 1;
+						    return EXIT_SUCCESS;
+
         }
     }
 
     if (optind >= argc) {
         perror("URL is required.");
         print_help(config);
-        return 1;
+		    return EXIT_FAILURE;
     }
 
     config.url = argv[optind];
