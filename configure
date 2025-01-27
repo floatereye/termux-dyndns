@@ -28,7 +28,7 @@ cat <<'EOL' > Makefile
 CC = clang  # Using clang, the default compiler for Termux (based on LLVM)
 CFLAGS = -Wall -O2
 LIBS = -lcurl -ljson-c
-TARGET = termux-freedns
+TARGET = termux-ddns-freedns
 SRC = $(TARGET).c
 
 all: $(TARGET)
