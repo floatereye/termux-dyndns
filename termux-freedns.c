@@ -12,10 +12,36 @@ typedef struct {
     const char *url;
 } Config;
 
+void dyndns_addr(Config config) {
+    FILE *file = fopen(config.file, "r");
+    if (!file) {
+        perror("Error opening JSON file");
+        return;
+    }
+
+    struct json_object *parsed_json, *targets, *target, *thisip;
+    char buffer[1024];
+    fread(buffer, 1, sizeof(buffer), file);
+    fclose(file);
+
+    parsed_json = json_tokener_parse(buffer);
+    if (!json_object_object_get_ex(parsed_json, "targets", &targets)) {
+        perror("Error parsing JSON: 'targets' not found");
+        exit(EXIT_FAILURE);
+    }
+
+    target = json_object_array_get_idx(targets, 0);
+    if (!json_object_object_get_ex(target, "thisip", &thisip)) {
+        perror("Error parsing JSON: 'thisip' not found");
+        exit(EXIT_FAILURE);
+    }
+
+    printf("%s\n", json_object_get_string(thisip));
+}
+
 size_t write_callback(void *ptr, size_t size, size_t nmemb, FILE *stream) {
     return fwrite(ptr, size, nmemb, stream);
 }
-
 void dyndns_req(Config config) {
     CURL *curl = curl_easy_init();
     if (!curl) {
@@ -50,33 +76,6 @@ void dyndns_req(Config config) {
 
     fclose(file);
     curl_easy_cleanup(curl);
-}
-
-void dyndns_addr(Config config) {
-    FILE *file = fopen(config.file, "r");
-    if (!file) {
-        perror("Error opening JSON file");
-        return;
-    }
-
-    struct json_object *parsed_json, *targets, *target, *thisip;
-    char buffer[1024];
-    fread(buffer, 1, sizeof(buffer), file);
-    fclose(file);
-
-    parsed_json = json_tokener_parse(buffer);
-    if (!json_object_object_get_ex(parsed_json, "targets", &targets)) {
-        perror("Error parsing JSON: 'targets' not found");
-        exit(EXIT_FAILURE);
-    }
-
-    target = json_object_array_get_idx(targets, 0);
-    if (!json_object_object_get_ex(target, "thisip", &thisip)) {
-        perror("Error parsing JSON: 'thisip' not found");
-        exit(EXIT_FAILURE);
-    }
-
-    printf("%s\n", json_object_get_string(thisip));
 }
 
 void print_help(Config config) {
