@@ -13,27 +13,21 @@ typedef struct {
     const char *url;
 } Config;
 
-void print_error(const char *msg) {
-    fprintf(stderr, "Error: %s\n", msg);
-    exit(EXIT_FAILURE);
-}
-
 size_t write_callback(void *ptr, size_t size, size_t nmemb, FILE *stream) {
     return fwrite(ptr, size, nmemb, stream);
 }
-
 void dyndns_req(Config config) {
     CURL *curl = curl_easy_init();
     if (!curl) {
-        print_error("Error initializing curl");
-        return;
+        perror("Error initializing curl");
+        exit(EXIT_FAILURE);
     }
 
     FILE *file = fopen(config.file, "w");
     if (!file) {
-        print_error("Error opening file for writing");
+        perror("Error opening file for writing");
         curl_easy_cleanup(curl);
-        return;
+        exit(EXIT_FAILURE);
     }
 
     char errbuf[CURL_ERROR_SIZE];
@@ -47,13 +41,9 @@ void dyndns_req(Config config) {
     errbuf[0] = 0;
     res = curl_easy_perform(curl);
     if (res != CURLE_OK) {
-      size_t len = strlen(errbuf);
-      fprintf(stderr, "\nlibcurl: (%d) ", res);
-      if(len)
-        fprintf(stderr, "%s%s", errbuf,
-                ((errbuf[len - 1] != '\n') ? "\n" : ""));
-      else
-        fprintf(stderr, "%s\n", curl_easy_strerror(res));
+      perror(curl_easy_strerror(res));
+      curl_easy_cleanup(curl);
+      fclose(file);
       exit(EXIT_FAILURE);
     }
 
@@ -64,7 +54,7 @@ void dyndns_req(Config config) {
 void dyndns_addr(Config config) {
     FILE *file = fopen(config.file, "r");
     if (!file) {
-        print_error("Error opening JSON file");
+        perror("Error opening JSON file");
         return;
     }
 
@@ -75,14 +65,14 @@ void dyndns_addr(Config config) {
 
     parsed_json = json_tokener_parse(buffer);
     if (!json_object_object_get_ex(parsed_json, "targets", &targets)) {
-        print_error("Error parsing JSON: 'targets' not found");
-        return;
+        perror("Error parsing JSON: 'targets' not found");
+        exit(EXIT_FAILURE);
     }
 
     target = json_object_array_get_idx(targets, 0);
     if (!json_object_object_get_ex(target, "thisip", &thisip)) {
-        print_error("Error parsing JSON: 'thisip' not found");
-        return;
+        perror("Error parsing JSON: 'thisip' not found");
+        exit(EXIT_FAILURE);
     }
 
     printf("[%s] %s\n", config.name, json_object_get_string(thisip));
@@ -133,7 +123,7 @@ int main(int argc, char *argv[]) {
     }
 
     if (optind >= argc) {
-        print_error("URL is required.");
+        perror("URL is required.");
         print_help();
         return 1;
     }
