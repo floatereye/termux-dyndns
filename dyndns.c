@@ -77,7 +77,7 @@ void dyndns_addr(Config config) {
         exit(EXIT_FAILURE);
     }
 
-    printf("[%s] %s\n", config.name, json_object_get_string(thisip));
+    printf("%s %s\n", config.name, json_object_get_string(thisip));
 }
 
 void print_help() {
