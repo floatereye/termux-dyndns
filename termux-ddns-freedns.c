@@ -87,15 +87,24 @@ void print_help(char* progname, Config config) {
     printf("  -h, --help    Show this help message\n");
 }
 
+
+
+int is_valid_url(const char *url) {
+    if (strncmp(url, "http://", 7) == 0 || strncmp(url, "https://", 8) == 0) {
+        return 1;
+    }
+    return 0;
+}
+
 int main(int argc, char *argv[]) {
 
     const char *progname = argv[0];
 
     size_t progname_len = strlen(progname);
-    char *json_file = malloc(progname_len + 6); // +6 for ".json" and null terminator
-    snprintf(json_file, progname_len + 6, "%s.json", progname);
-    Config config = {json_file, 2, NULL};
-    free(json_file);
+    char *file = malloc(progname_len + 6); // +6 for ".json" and null terminator
+    snprintf(file, progname_len + 6, "%s.json", progname);
+    Config config = {file, 2, NULL};
+    free(file);
 
     int option;
     static struct option long_options[] = {
@@ -121,12 +130,11 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    if (optind >= argc) {
-        perror("URL is required.");
+    if (optind >= argc || !is_valid_url(argv[optind])) {
+        printf("URL is required.\n");
         print_help(argv[0], config);
 		    return EXIT_FAILURE;
     }
-
     config.url = argv[optind];
 
     sleep(config.delay);
