@@ -1,4 +1,4 @@
-Requests url. Saves to file. Optional delay.
+Requests token-url. Saves to file. Optional delay.
 
 ```
 Install:
