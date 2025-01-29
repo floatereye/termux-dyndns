@@ -6,7 +6,7 @@ Install:
 ```
 
 ````
-Usage: dyndns <url> [options]
+Usage: ./termux-ddns-freedns <url> [options]
 Options:
   -f <file>     Path to JSON file (default: ./dyndns.json)
   -d <delay>    Delay in seconds before execution (default: 2)
