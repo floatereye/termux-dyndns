@@ -120,19 +120,19 @@ int main(int argc, char *argv[]) {
             case 'd':
                 config.delay = atoi(optarg);
                 break;
-						case 'h':
-								print_help(argv[0], config);
-								return EXIT_SUCCESS;
-						default:
-								print_help(argv[0], config);
-								return EXIT_SUCCESS;
-				}
-		}
+            case 'h':
+                print_help(argv[0], config);
+                return EXIT_SUCCESS;
+            default:
+                print_help(argv[0], config);
+                return EXIT_SUCCESS;
+        }
+    }
 
     if (optind >= argc || !is_valid_url(argv[optind])) {
         printf("%s: URL is required.\n", progname);
         print_help(argv[0], config);
-		    return EXIT_FAILURE;
+        return EXIT_FAILURE;
     }
     config.url = argv[optind];
 
