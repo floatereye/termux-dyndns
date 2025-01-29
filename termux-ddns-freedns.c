@@ -10,9 +10,9 @@ typedef struct {
     const char *file;
     int delay;
     const char *url;
-} Config;
+} config_t;
 
-void dyndns_addr(Config config) {
+void dyndns_addr(config_t config) {
     FILE *file = fopen(config.file, "r");
     if (!file) {
         perror("Error opening JSON file");
@@ -42,7 +42,7 @@ void dyndns_addr(Config config) {
 size_t write_callback(void *ptr, size_t size, size_t nmemb, FILE *stream) {
     return fwrite(ptr, size, nmemb, stream);
 }
-void dyndns_req(Config config) {
+void dyndns_req(config_t config) {
     CURL *curl = curl_easy_init();
     if (!curl) {
         perror("Error initializing curl");
@@ -79,7 +79,7 @@ void dyndns_req(Config config) {
     curl_easy_cleanup(curl);
 }
 
-void print_help(char* progname, Config config) {
+void print_help(char progname[], config_t config) {
     printf("Usage: %s <url> [options]\n", progname);
     printf("Options:\n");
     printf("  -f <file>     Path to JSON file (default: %s)\n", config.file);
@@ -101,9 +101,9 @@ int main(int argc, char *argv[]) {
     const char *progname = argv[0];
 
     size_t progname_len = strlen(progname);
-    char *file = malloc(progname_len + 6); // +6 for ".json" and null terminator
+    char *file = malloc(progname_len + 6);
     snprintf(file, progname_len + 6, "%s.json", progname);
-    Config config = {file, 2, NULL};
+    config_t config = {file, 2, NULL};
     free(file);
 
     int option;
@@ -120,18 +120,17 @@ int main(int argc, char *argv[]) {
             case 'd':
                 config.delay = atoi(optarg);
                 break;
-            case 'h':
-            		print_help(argv[0], config);
-                return EXIT_SUCCESS;
-            default:
-            		print_help(argv[0], config);
-            		return EXIT_SUCCESS;
-
-        }
-    }
+						case 'h':
+								print_help(argv[0], config);
+								return EXIT_SUCCESS;
+						default:
+								print_help(argv[0], config);
+								return EXIT_SUCCESS;
+				}
+		}
 
     if (optind >= argc || !is_valid_url(argv[optind])) {
-        printf("URL is required.\n");
+        printf("%s: URL is required.\n", progname);
         print_help(argv[0], config);
 		    return EXIT_FAILURE;
     }
