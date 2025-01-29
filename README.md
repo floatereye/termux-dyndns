@@ -1,4 +1,4 @@
-termux-ddns-freedns is a C program that updates your IP on FreeDNS (https://freedns.afraid.org) using their API and token, saves the response in a JSON file, and supports an optional delay.
+termux-ddns-freedns updates your IP on FreeDNS (https://freedns.afraid.org) using their API and token, saves the response in a JSON file, and supports an optional delay.
 
 ```
 Install:
