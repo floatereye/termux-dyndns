@@ -1,4 +1,4 @@
-Requests url. Saves to file. Optional delay.
+termux-ddns-freedns is a C program that uses FreeDNS's latest API with a token for manual update requests. It sends the request to https://freedns.afraid.org, saves the response in a JSON file, and supports an optional delay before execution.
 
 ```
 Install:
