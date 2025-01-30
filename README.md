@@ -8,8 +8,6 @@ Install:
 ````
 Usage: ./termux-ddns-freedns <url> [options]
 Options:
-Usage: ./termux-ddns-freedns <url> [options]
-Options:
   -f <file>     Path to JSON file
   -d <delay>    Delay in seconds before execution (default: 2)
   -u <user>     HTTP basic auth user
