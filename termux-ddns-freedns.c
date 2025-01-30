@@ -61,6 +61,12 @@ void update_dns_record(config_t config) {
     curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 2L);
     curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
 
+    if (config.username && config.password) {
+	      curl_easy_setopt(curl, CURLOPT_HTTPAUTH, (long)CURLAUTH_BASIC);
+        curl_easy_setopt(curl, CURLOPT_USERNAME, config.username);
+        curl_easy_setopt(curl, CURLOPT_PASSWORD, config.password);
+    }
+
     CURLcode res = curl_easy_perform(curl);
     if (res != CURLE_OK) {
         fprintf(stderr, "[ERROR] curl_easy_perform() failed: %s\n", curl_easy_strerror(res));
