@@ -8,8 +8,10 @@
 
 typedef struct {
     int delay;
-    const char *output_file;
     const char *url;
+    const char *username;
+    const char *password;
+    const char *output_file;
 } config_t;
 
 void parse_dns_response(config_t config) {
@@ -81,11 +83,8 @@ void print_help(char progname[], config_t config) {
     printf("Options:\n");
     printf("  -f <file>     Path to JSON file\n");
     printf("  -d <delay>    Delay in seconds before execution (default: %d)\n", config.delay);
-    printf("  -h <ip>       Specify a ip instead of automatic server side IP detection\n");
-    printf("  -h <host>     Hostname to update\n");
-    printf("  -u <user>     HTTP user\n");
-    printf("  -p <password> HTTP password\n");
-    printf("  -a, --auth    Use HTTP Authentication\n");
+    printf("  -u <user>     HTTP basic auth user\n");
+    printf("  -p <password> HTTP basic auth password\n");
     printf("  -h, --help    Show this help message\n");
 }
 int main(int argc, char *argv[]) {
@@ -111,6 +110,10 @@ int main(int argc, char *argv[]) {
                 break;
             case 'd':
                 config.delay = atoi(optarg);
+            case 'u':
+                config.username = optarg;
+            case 'p':
+                config.password = optarg;
                 break;
             case 'h':
                 print_help(argv[0], config);
