@@ -1,7 +1,7 @@
 #!/bin/sh
 
 if [ -z "$PREFIX" ]; then
-  PREFIX=PATH
+  PREFIX=""
 fi
 
 # Process command-line arguments
