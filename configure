@@ -82,9 +82,15 @@ all: $(TARGET)
 $(TARGET): $(SRC)
 	$(CC) $(CFLAGS) -o $(TARGET) $(SRC) $(LDFLAGS)
 
+release: all
+	mkdir -p release/
+	cp $(TARGET) release/
+	strip -s release/$(TARGET)
+
 clean:
 	rm -f $(TARGET)
-
+	rm -rf release/
+	
 install:
 	install -m 755 $(TARGET) $(PREFIX)/bin/
 

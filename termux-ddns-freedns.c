@@ -12,7 +12,7 @@ typedef struct {
     const char *url;
 } config_t;
 
-void dyndns_addr(config_t config) {
+void parse_dns_response(config_t config) {
     FILE *file = fopen(config.output_file, "r");
     if (!file) {
         perror("Error opening JSON file");
@@ -39,7 +39,7 @@ void dyndns_addr(config_t config) {
     printf("%s\n", json_object_get_string(thisip));
 }
 
-void dyndns_req(config_t config) {
+void update_dns_record(config_t config) {
     CURL *curl = curl_easy_init();
     if (!curl) {
         fprintf(stderr, "[ERROR] curl_easy_init() failed\n");
@@ -69,7 +69,7 @@ void dyndns_req(config_t config) {
 }
 
 
-int is_valid_url(const char *url) {
+int validate_url_format(const char *url) {
     if (strncmp(url, "http://", 7) == 0 || strncmp(url, "https://", 8) == 0) {
         return 1;
     }
@@ -116,7 +116,7 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    if (optind >= argc || !is_valid_url(argv[optind])) {
+    if (optind >= argc || !validate_url_format(argv[optind])) {
         printf("%s: URL is required.\n", progname);
         print_help(argv[0], config);
         return EXIT_FAILURE;
@@ -138,8 +138,8 @@ int main(int argc, char *argv[]) {
     }
 
     sleep(config.delay);
-    dyndns_req(config);
-    dyndns_addr(config);
+    update_dns_record(config);
+    parse_dns_response(config);
 
     return EXIT_SUCCESS;
 }
