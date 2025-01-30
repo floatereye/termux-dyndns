@@ -8,8 +8,12 @@ Install:
 ````
 Usage: ./termux-ddns-freedns <url> [options]
 Options:
-  -f <file>     Path to JSON file (default: ./dyndns.json)
+  -f <file>     Path to JSON file
   -d <delay>    Delay in seconds before execution (default: 2)
-  -n, --name    Name to display in output (default: dyndns)
+  -h <ip>       Specify a ip instead of automatic server side IP detection
+  -h <host>     Hostname to update
+  -u <user>     HTTP user
+  -p <password> HTTP password
+  -a, --auth    Use HTTP Authentication
   -h, --help    Show this help message
 ````
