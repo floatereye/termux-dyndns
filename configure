@@ -1,7 +1,7 @@
 #!/bin/sh
 
 if [ -z "$PREFIX" ]; then
-	PREFIX=PATH
+  PREFIX=PATH
 fi
 
 # Process command-line arguments
@@ -30,8 +30,30 @@ fi
 
 # Check for libcurl and json-c
 if ! pkg-config --exists libcurl json-c; then
-  echo "[ERROR] Required libraries (libcurl, json-c) not found. Please install them."
-  exit 1
+  if test -e "$PREFIX/bin/pkg"; then
+    echo "Attempting to install dependencies for Termux..."
+
+    # Install libllvm (GCC replacement) if not present
+    if ! pkg list-installed 2>/dev/null | grep -q '^libllvm'; then
+        echo "Installing libllvm (GCC replacement)..."
+        pkg install -y libllvm
+    fi
+
+    # Install libcurl if not present
+    if ! pkg list-installed 2>/dev/null | grep -q '^libcurl'; then
+        echo "Installing libcurl..."
+        pkg install -y libcurl
+    fi
+
+    # Install json-c if not present
+    if ! pkg list-installed 2>/dev/null | grep -q '^json-c'; then
+        echo "Installing json-c..."
+        pkg install -y json-c
+    fi
+  else
+    echo "[ERROR] Required libraries (libcurl, json-c) not found. Please install them."
+    exit 1
+  fi
 fi
 
 # Get compiler and linker flags
@@ -58,16 +80,16 @@ include config.mk
 all: \$(TARGET)
 
 \$(TARGET): \$(SRC)
-	\$(CC) \$(CFLAGS) -o \$(TARGET) \$(SRC) \$(LDFLAGS)
+  \$(CC) \$(CFLAGS) -o \$(TARGET) \$(SRC) \$(LDFLAGS)
 
 clean:
-	rm -f \$(TARGET)
+  rm -f \$(TARGET)
 
 install:
-	install -m 755 \$(TARGET) \$(PREFIX)/bin/
+  install -m 755 \$(TARGET) \$(PREFIX)/bin/
 
 uninstall:
-	rm -f \$(PREFIX)/bin/\$(TARGET)
+  rm -f \$(PREFIX)/bin/\$(TARGET)
 EOF
 
 echo "Configuration successful. Makefile generated. Run 'make' to build."
