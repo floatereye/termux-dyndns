@@ -7,13 +7,13 @@
 #include <getopt.h>
 
 typedef struct {
-    const char *file;
     int delay;
+    const char *output_file;
     const char *url;
 } config_t;
 
 void dyndns_addr(config_t config) {
-    FILE *file = fopen(config.file, "r");
+    FILE *file = fopen(config.output_file, "r");
     if (!file) {
         perror("Error opening JSON file");
         return;
@@ -39,54 +39,34 @@ void dyndns_addr(config_t config) {
     printf("%s\n", json_object_get_string(thisip));
 }
 
-size_t write_callback(void *ptr, size_t size, size_t nmemb, FILE *stream) {
-    return fwrite(ptr, size, nmemb, stream);
-}
 void dyndns_req(config_t config) {
     CURL *curl = curl_easy_init();
     if (!curl) {
-        perror("Error initializing curl");
-        curl_easy_cleanup(curl);
-        exit(EXIT_FAILURE);
+        fprintf(stderr, "[ERROR] curl_easy_init() failed\n");
+        return;
     }
 
-    FILE *file = fopen(config.file, "w");
-    if (!file) {
-        perror("Error opening file for writing");
+    FILE *fp = fopen(config.output_file, "wb");
+    if (!fp) {
+        fprintf(stderr, "[ERROR] Failed to open output file\n");
         curl_easy_cleanup(curl);
-        exit(EXIT_FAILURE);
+        return;
     }
 
-    char errbuf[CURL_ERROR_SIZE];
-
-    curl_easy_setopt(curl, CURLOPT_ERRORBUFFER, errbuf);
     curl_easy_setopt(curl, CURLOPT_URL, config.url);
-    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_callback);
-    curl_easy_setopt(curl, CURLOPT_WRITEDATA, file);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, fp);
+    curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 1L);
+    curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, 2L);
+    curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
 
-    CURLcode res;
-    errbuf[0] = 0;
-    res = curl_easy_perform(curl);
+    CURLcode res = curl_easy_perform(curl);
     if (res != CURLE_OK) {
-      perror(config.url);
-      perror(curl_easy_strerror(res));
-      curl_easy_cleanup(curl);
-      fclose(file);
-      exit(EXIT_FAILURE);
+        fprintf(stderr, "[ERROR] curl_easy_perform() failed: %s\n", curl_easy_strerror(res));
     }
 
-    fclose(file);
+    fclose(fp);
     curl_easy_cleanup(curl);
 }
-
-void print_help(char progname[], config_t config) {
-    printf("Usage: %s <url> [options]\n", progname);
-    printf("Options:\n");
-    printf("  -f <file>     Path to JSON file (default: %s)\n", config.file);
-    printf("  -d <delay>    Delay in seconds before execution (default: %d)\n", config.delay);
-    printf("  -h, --help    Show this help message\n");
-}
-
 
 
 int is_valid_url(const char *url) {
@@ -96,15 +76,18 @@ int is_valid_url(const char *url) {
     return 0;
 }
 
+void print_help(char progname[], config_t config) {
+    printf("Usage: %s <url> [options]\n", progname);
+    printf("Options:\n");
+    printf("  -f <file>     Path to JSON file (default: %s)\n", config.output_file);
+    printf("  -d <delay>    Delay in seconds before execution (default: %d)\n", config.delay);
+    printf("  -h, --help    Show this help message\n");
+}
 int main(int argc, char *argv[]) {
 
     const char *progname = argv[0];
-
-    size_t progname_len = strlen(progname);
-    char *file = malloc(progname_len + 6);
-    snprintf(file, progname_len + 6, "%s.json", progname);
-    config_t config = {file, 2, NULL};
-    free(file);
+    config_t config = {0};
+		config.delay = 2;
 
     int option;
     static struct option long_options[] = {
@@ -115,7 +98,11 @@ int main(int argc, char *argv[]) {
     while ((option = getopt_long(argc, argv, "f:d:n:h", long_options, NULL)) != -1) {
         switch (option) {
             case 'f':
-                config.file = optarg;
+					  	  if (1 + strlen(optarg) >= 255) {
+										fprintf(stderr, "%s: Path too long\n", progname);
+										exit(EXIT_FAILURE);
+								}
+                config.output_file = optarg;
                 break;
             case 'd':
                 config.delay = atoi(optarg);
@@ -135,6 +122,20 @@ int main(int argc, char *argv[]) {
         return EXIT_FAILURE;
     }
     config.url = argv[optind];
+
+    if (! config.output_file) {
+				static char output_file[255];
+
+		    if (strlen(progname + 5) >= 255) {
+					fprintf(stderr, "Path too long\n");
+					exit(EXIT_FAILURE);
+				}
+
+        strcat(output_file, progname);
+        strcat(output_file, ".json");
+
+        config.output_file = output_file;
+    }
 
     sleep(config.delay);
     dyndns_req(config);
