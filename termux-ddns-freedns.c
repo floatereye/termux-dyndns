@@ -79,7 +79,7 @@ int validate_url_format(const char *url) {
 void print_help(char progname[], config_t config) {
     printf("Usage: %s <url> [options]\n", progname);
     printf("Options:\n");
-    printf("  -f <file>     Path to JSON file (default: %s)\n", config.output_file);
+    printf("  -f <file>     Path to JSON file\n");
     printf("  -d <delay>    Delay in seconds before execution (default: %d)\n", config.delay);
     printf("  -h, --help    Show this help message\n");
 }
