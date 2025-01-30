@@ -2,24 +2,26 @@
 
 set -euo pipefail  # Enable strict mode: exit on error, unset variables, and pipefail
 
-echo "Checking and installing dependencies for Termux..."
+if test -e "$PREFIX/bin/pkg"; then
+	echo "Checking and installing dependencies for Termux..."
 
-# Install libllvm (GCC replacement) if not present
-if ! pkg list-installed 2>/dev/null | grep -q '^libllvm'; then
-    echo "Installing libllvm (GCC replacement)..."
-    pkg install -y libllvm
-fi
+	# Install libllvm (GCC replacement) if not present
+	if ! pkg list-installed 2>/dev/null | grep -q '^libllvm'; then
+	    echo "Installing libllvm (GCC replacement)..."
+	    pkg install -y libllvm
+	fi
 
-# Install libcurl if not present
-if ! pkg list-installed 2>/dev/null | grep -q '^libcurl'; then
-    echo "Installing libcurl..."
-    pkg install -y libcurl
-fi
+	# Install libcurl if not present
+	if ! pkg list-installed 2>/dev/null | grep -q '^libcurl'; then
+	    echo "Installing libcurl..."
+	    pkg install -y libcurl
+	fi
 
-# Install json-c if not present
-if ! pkg list-installed 2>/dev/null | grep -q '^json-c'; then
-    echo "Installing json-c..."
-    pkg install -y json-c
+	# Install json-c if not present
+	if ! pkg list-installed 2>/dev/null | grep -q '^json-c'; then
+	    echo "Installing json-c..."
+	    pkg install -y json-c
+	fi
 fi
 
 echo "Creating Makefile..."
