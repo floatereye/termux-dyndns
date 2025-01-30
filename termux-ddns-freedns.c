@@ -87,7 +87,7 @@ int main(int argc, char *argv[]) {
 
     const char *progname = argv[0];
     config_t config = {0};
-		config.delay = 2;
+    config.delay = 2;
 
     int option;
     static struct option long_options[] = {
@@ -98,10 +98,10 @@ int main(int argc, char *argv[]) {
     while ((option = getopt_long(argc, argv, "f:d:n:h", long_options, NULL)) != -1) {
         switch (option) {
             case 'f':
-					  	  if (1 + strlen(optarg) >= 255) {
-										fprintf(stderr, "%s: Path too long\n", progname);
-										exit(EXIT_FAILURE);
-								}
+                if (1 + strlen(optarg) >= 255) {
+                    fprintf(stderr, "%s: Path too long\n", progname);
+                    exit(EXIT_FAILURE);
+                }
                 config.output_file = optarg;
                 break;
             case 'd':
@@ -124,12 +124,12 @@ int main(int argc, char *argv[]) {
     config.url = argv[optind];
 
     if (! config.output_file) {
-				static char output_file[255];
+        static char output_file[255];
 
-		    if (strlen(progname + 5) >= 255) {
-					fprintf(stderr, "Path too long\n");
-					exit(EXIT_FAILURE);
-				}
+        if (strlen(progname + 5) >= 255) {
+          fprintf(stderr, "Path too long\n");
+          exit(EXIT_FAILURE);
+        }
 
         strcat(output_file, progname);
         strcat(output_file, ".json");
