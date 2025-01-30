@@ -80,16 +80,16 @@ include config.mk
 all: \$(TARGET)
 
 \$(TARGET): \$(SRC)
-  \$(CC) \$(CFLAGS) -o \$(TARGET) \$(SRC) \$(LDFLAGS)
+	\$(CC) \$(CFLAGS) -o \$(TARGET) \$(SRC) \$(LDFLAGS)
 
 clean:
-  rm -f \$(TARGET)
+	rm -f \$(TARGET)
 
 install:
-  install -m 755 \$(TARGET) \$(PREFIX)/bin/
+	install -m 755 \$(TARGET) \$(PREFIX)/bin/
 
 uninstall:
-  rm -f \$(PREFIX)/bin/\$(TARGET)
+	rm -f \$(PREFIX)/bin/\$(TARGET)
 EOF
 
 echo "Configuration successful. Makefile generated. Run 'make' to build."
