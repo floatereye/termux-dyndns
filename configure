@@ -1,57 +1,70 @@
-#!/bin/bash
+#!/bin/sh
 
-set -euo pipefail  # Enable strict mode: exit on error, unset variables, and pipefail
+# Process command-line arguments
+while [ "$#" -gt 0 ]; do
+  case "$1" in
+    --prefix=*)
+      PREFIX="$(echo "$1" | cut -d'=' -f2)"
+      ;;
+    --help)
+      echo "Usage: ./configure [--prefix=<install_path>]"
+      exit 0
+      ;;
+    *)
+      echo "Unknown option: $1"
+      exit 1
+      ;;
+  esac
+  shift
+done
 
-if test -e "$PREFIX/bin/pkg"; then
-	echo "Checking and installing dependencies for Termux..."
-
-	# Install libllvm (GCC replacement) if not present
-	if ! pkg list-installed 2>/dev/null | grep -q '^libllvm'; then
-	    echo "Installing libllvm (GCC replacement)..."
-	    pkg install -y libllvm
-	fi
-
-	# Install libcurl if not present
-	if ! pkg list-installed 2>/dev/null | grep -q '^libcurl'; then
-	    echo "Installing libcurl..."
-	    pkg install -y libcurl
-	fi
-
-	# Install json-c if not present
-	if ! pkg list-installed 2>/dev/null | grep -q '^json-c'; then
-	    echo "Installing json-c..."
-	    pkg install -y json-c
-	fi
+# Check for pkg-config
+if ! command -v pkg-config >/dev/null 2>&1; then
+  echo "[ERROR] pkg-config is not installed. Please install it."
+  exit 1
 fi
 
-echo "Creating Makefile..."
+# Check for libcurl and json-c
+if ! pkg-config --exists libcurl json-c; then
+  echo "[ERROR] Required libraries (libcurl, json-c) not found. Please install them."
+  exit 1
+fi
 
-cat <<'EOL' > Makefile
-CC = clang  # Using clang, the default compiler for Termux (based on LLVM)
-CFLAGS = -Wall -O2
-LIBS = -lcurl -ljson-c
-TARGET = termux-ddns-freedns
-SRC = $(TARGET).c
+# Get compiler and linker flags
+CFLAGS="$(pkg-config --cflags libcurl json-c) -Wall -O2"
+LDFLAGS="$(pkg-config --libs libcurl json-c)"
+CC=clang
+TARGET=termux-ddns-freedns
+SRC=${TARGET}.c
 
-all: $(TARGET)
+# Generate config.mk
+cat > config.mk <<EOF
+CC=$CC
+CFLAGS=$CFLAGS
+LDFLAGS=$LDFLAGS
+TARGET=$TARGET
+SRC=$SRC
+PREFIX=$PREFIX
+EOF
 
-$(TARGET): $(SRC)
-	$(CC) $(CFLAGS) -o $(TARGET) $(SRC) $(LIBS)
+# Generate Makefile
+cat > Makefile <<EOF
+include config.mk
+
+all: \$(TARGET)
+
+\$(TARGET): \$(SRC)
+	\$(CC) \$(CFLAGS) -o \$(TARGET) \$(SRC) \$(LDFLAGS)
 
 clean:
-	rm -f $(TARGET)
-	rm -rf release/
-
-release: all
-	mkdir -p release/
-	cp $(TARGET) release/
-	strip -s release/$(TARGET)
+	rm -f \$(TARGET)
 
 install:
-	install -m 755 $(TARGET) $(PREFIX)/bin/
+	install -m 755 \$(TARGET) \$(PREFIX)/bin/
 
 uninstall:
-	rm -f /data/data/com.termux/files/usr/bin/$(TARGET)
-EOL
+	rm -f \$(PREFIX)/bin/\$(TARGET)
+EOF
 
-echo "Configuration complete. You can now run 'make' to build the project."
+echo "Configuration successful. Makefile generated. Run 'make' to build."
+
