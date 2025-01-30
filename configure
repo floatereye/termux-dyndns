@@ -74,23 +74,23 @@ PREFIX=$PREFIX
 EOF
 
 # Generate Makefile
-cat > Makefile <<EOF
+cat <<'EOL' > Makefile
 include config.mk
 
-all: \$(TARGET)
+all: $(TARGET)
 
-\$(TARGET): \$(SRC)
-	\$(CC) \$(CFLAGS) -o \$(TARGET) \$(SRC) \$(LDFLAGS)
+$(TARGET): $(SRC)
+	$(CC) $(CFLAGS) -o $(TARGET) $(SRC) $(LDFLAGS)
 
 clean:
-	rm -f \$(TARGET)
+	rm -f $(TARGET)
 
 install:
-	install -m 755 \$(TARGET) \$(PREFIX)/bin/
+	install -m 755 $(TARGET) $(PREFIX)/bin/
 
 uninstall:
-	rm -f \$(PREFIX)/bin/\$(TARGET)
-EOF
+	rm -f $(PREFIX)/bin/$(TARGET)
+EOL
 
 echo "Configuration successful. Makefile generated. Run 'make' to build."
 
