@@ -126,7 +126,7 @@ int main(int argc, char *argv[]) {
     if (! config.output_file) {
         static char output_file[255];
 
-        if (strlen(progname + 5) >= 255) {
+        if (1 + strlen(progname + 5) >= 255) {
           fprintf(stderr, "Path too long\n");
           exit(EXIT_FAILURE);
         }
