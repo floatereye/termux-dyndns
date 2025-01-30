@@ -127,8 +127,8 @@ int main(int argc, char *argv[]) {
         static char output_file[255];
 
         if (1 + strlen(progname + 5) >= 255) {
-          fprintf(stderr, "Path too long\n");
-          exit(EXIT_FAILURE);
+            fprintf(stderr, "%s: Path too long\n", progname);
+            exit(EXIT_FAILURE);
         }
 
         strcat(output_file, progname);
