@@ -81,6 +81,11 @@ void print_help(char progname[], config_t config) {
     printf("Options:\n");
     printf("  -f <file>     Path to JSON file\n");
     printf("  -d <delay>    Delay in seconds before execution (default: %d)\n", config.delay);
+    printf("  -h <ip>       Specify a ip instead of automatic server side IP detection\n");
+    printf("  -h <host>     Hostname to update\n");
+    printf("  -u <user>     HTTP user\n");
+    printf("  -p <password> HTTP password\n");
+    printf("  -a, --auth    Use HTTP Authentication\n");
     printf("  -h, --help    Show this help message\n");
 }
 int main(int argc, char *argv[]) {
