@@ -29,36 +29,36 @@ if ! command -v pkg-config >/dev/null 2>&1; then
 fi
 
 # Check for libcurl and json-c
-if ! pkg-config --exists libcurl json-c; then
+if ! pkg-config --exists libcurl jq; then
   if test -e "$PREFIX/bin/pkg"; then
     echo "Attempting to install dependencies for Termux..."
 
     # Install libllvm (GCC replacement) if not present
     if ! pkg list-installed 2>/dev/null | grep -q '^libllvm'; then
         echo "Installing libllvm (GCC replacement)..."
-        pkg install -y libllvm
+        pkg install libllvm
     fi
 
     # Install libcurl if not present
     if ! pkg list-installed 2>/dev/null | grep -q '^libcurl'; then
         echo "Installing libcurl..."
-        pkg install -y libcurl
+        pkg install libcurl
     fi
 
     # Install json-c if not present
-    if ! pkg list-installed 2>/dev/null | grep -q '^json-c'; then
-        echo "Installing json-c..."
-        pkg install -y json-c
+    if ! pkg list-installed 2>/dev/null | grep -q '^jq'; then
+        echo "Installing jq..."
+        pkg install jq
     fi
   else
-    echo "[ERROR] Required libraries (libcurl, json-c) not found. Please install them."
+    echo "[ERROR] Required libraries (libcurl, jq) not found. Please install them."
     exit 1
   fi
 fi
 
 # Get compiler and linker flags
-CFLAGS="$(pkg-config --cflags libcurl json-c) -Wall -O2"
-LDFLAGS="$(pkg-config --libs libcurl json-c)"
+CFLAGS="$(pkg-config --cflags libcurl libjq) -Wall -O2"
+LDFLAGS="$(pkg-config --libs libcurl libjq)"
 CC=clang
 TARGET=termux-ddns-freedns
 SRC=${TARGET}.c
